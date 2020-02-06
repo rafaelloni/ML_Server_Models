@@ -1,8 +1,12 @@
 import streamlit as st 
 import pandas as pd
+import numpy as np
 from sklearn.linear_model import LinearRegression 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
+from sklearn import metrics
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 super_unsuper = ""
@@ -57,7 +61,6 @@ except:
 
 X_features = st.text_input("Features: ").split()
 y_target = st.text_input("Target: ").split()
-
 try:
     data_feature = TakeFeatures(data_csv, X_features)
     data_target = TakeTarget(data_csv, y_target)
@@ -67,14 +70,10 @@ except:
 
 lr_ts = st.number_input("Test size: ")
 lr_rs = st.number_input("Random state: ")
-
 try:
     X_train, X_test, y_train, y_test = train_test_split(data_feature, data_target, test_size=lr_ts, random_state=int(lr_rs))
 except:
     st.write("Não possivel separar os dados")
-
-
-
 
 ########################################
 # LINEAR REGRESSION
@@ -84,5 +83,29 @@ if ML_option == "Linear Regression":
         linReg.fit(X_train, y_train)
         pred = linReg.predict(X_test)
         st.write("R2 Score: ", r2_score(y_test, pred))
+        st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
+        st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
+        st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
     except:
         st.write("Preencha todos os parâmetros")
+
+    try:
+        coeff_df = pd.DataFrame(linReg.coef_,index=["Coefficient"] ,columns=[data_feature.columns])
+        st.write(coeff_df)
+    except:
+        pass
+
+    try:
+        plt.scatter(y_test,pred)
+        plt.xlabel("Real")
+        plt.ylabel("Predictions")
+        st.pyplot()
+    except:
+        pass
+    try:
+        ibins = st.number_input("bins: ",min_value=1,step=1)
+        sns.distplot((y_test-pred),bins=int(ibins))
+        plt.xlabel("Target")
+        st.pyplot()
+    except:
+        pass
