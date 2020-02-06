@@ -4,7 +4,11 @@ import numpy as np
 from sklearn.linear_model import LinearRegression 
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble import RandomForestRegressor 
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import r2_score
 from sklearn import metrics
 import matplotlib.pyplot as plt
@@ -25,7 +29,7 @@ super_unsuper = st.sidebar.radio("Choose a model", ("Supervised Learning", "Unsu
 if super_unsuper == "Supervised Learning":
     super_regre_class = st.sidebar.radio("Choose a type", ("Regression", "Classification"))
     if super_regre_class == "Regression":
-        ML_option = st.sidebar.radio("", ("Linear Regression", "KNN Regression", "Random Forest", "Naive Bayes", "Support Vector Regression"))
+        ML_option = st.sidebar.radio("Choose a regressor", ("Linear Regression", "KNN Regression", "Decision Tree Regressor","Random Forest Regressor", "Naive Bayes", "Support Vector Regression"))
     else:
         pass
 else:
@@ -59,6 +63,13 @@ def GetTarget(dataframe, colunas):
         df_X = df_X.join(dataframe[[colunas[i]]])
     return df_X
 
+# Function to label encoder
+def GetEncoder(dataframe, colunas):
+    le = LabelEncoder()
+    for col in colunas:
+        dataframe[col] = le.fit_transform(dataframe[col])
+    return dataframe
+
 # Show CSV head
 try:
     data_csv = GetFile()
@@ -67,14 +78,34 @@ except:
     st.write("Adicione um dataset.")
 
 
+# Label encoder
+try:
+    if st.checkbox("Label encoder"):
+        columns_encoder = st.multiselect("Choose columns to encoder: ", data_csv.columns)
+        data_csv = GetEncoder(data_csv, columns_encoder)        
+except:
+    pass
+
+
+# Choose features and target
+st.subheader("Features and Target")
 try:
     X_features = st.multiselect("Features: ", data_csv.columns)
     y_target = st.multiselect("Target: ", data_csv.columns)
 except:
     pass
 
+
 try:
+    # Get features
     data_feature = GetFeatures(data_csv, X_features)
+    # Features normalization
+    if st.checkbox("Normalize features"):
+        scaler = StandardScaler()
+        scaler.fit(data_feature)
+        df_scaled = scaler.transform(data_feature)
+        data_feature = pd.DataFrame(df_scaled, columns=data_feature.columns)
+    # Get target
     data_target = GetTarget(data_csv, y_target)
     st.write("Features", data_feature.head(), "Target",data_target.head())
 except:
@@ -136,6 +167,7 @@ if ML_option == "Linear Regression":
 if ML_option == "KNN Regression":
     # Fit the model and predict X_test. Show some analysis.
     try:
+        st.subheader("KNN Parameters")
         Neigh = st.number_input("Number of neighbors: ", min_value=1, step=1)
         KNNReg = KNeighborsRegressor(n_neighbors=Neigh)
         KNNReg.fit(X_train, y_train)
@@ -167,14 +199,13 @@ if ML_option == "KNN Regression":
         pass
 
 
-# KNN REGRESSION
-if ML_option == "Random Forest":
+# DECISION TREE REGRESSOR
+if ML_option == "Decision Tree Regressor":
     # Fit the model and predict X_test. Show some analysis.
     try:
-        Neigh = st.number_input("Number of neighbors: ", min_value=1, step=1)
-        KNNReg = KNeighborsRegressor(n_neighbors=Neigh)
-        KNNReg.fit(X_train, y_train)
-        pred = KNNReg.predict(X_test)
+        DTreeReg = DecisionTreeRegressor()
+        DTreeReg.fit(X_train, y_train)
+        pred = DTreeReg.predict(X_test)
         st.write("R2 Score: ", r2_score(y_test, pred))
         st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
         st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
@@ -195,7 +226,44 @@ if ML_option == "Random Forest":
     # Distribuition Plot
     try:
         ibins = st.number_input("bins: ",min_value=1,step=1)
-        sns.distplot((y_test-pred),bins=int(ibins))
+        sns.distplot((y_test-[pred]),bins=int(ibins))
+        plt.xlabel("Target")
+        st.pyplot()
+    except:
+        pass
+
+
+# KNN REGRESSION
+if ML_option == "Random Forest Regressor":
+    # Fit the model and predict X_test. Show some analysis.
+    try:
+        st.subheader("Random Forest Parameters")
+        Nestim = st.number_input("Number of estimators: ", min_value=1, step=1)
+        RanStaFor = st.number_input("Random state for random forest model: ", min_value=1, step=1)
+        RForest = RandomForestRegressor(n_estimators=Nestim, random_state=RanStaFor)
+        RForest.fit(X_train, y_train)
+        pred = RForest.predict(X_test)
+        st.write("R2 Score: ", r2_score(y_test, pred))
+        st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
+        st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
+        st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
+    except:
+        st.write("Preencha todos os parâmetros")
+
+    
+    # Scatter Plot
+    try:
+        plt.scatter(y_test,pred)
+        plt.xlabel("Real")
+        plt.ylabel("Predictions")
+        st.pyplot()
+    except:
+        pass
+
+    # Distribuition Plot
+    try:
+        ibins = st.number_input("bins: ",min_value=1,step=1)
+        sns.distplot((y_test-[pred]),bins=int(ibins))
         plt.xlabel("Target")
         st.pyplot()
     except:
