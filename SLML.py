@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression 
+from sklearn.neighbors import KNeighborsRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 from sklearn import metrics
@@ -123,3 +124,51 @@ if ML_option == "Linear Regression":
         st.pyplot()
     except:
         pass
+
+
+
+if ML_option == "KNN Regression":
+    # Fit the model and predict X_test. Show some analysis.
+    try:
+        KNNReg = KNeighborsRegressor()
+        KNNReg.fit(X_train, y_train)
+        pred = KNNReg.predict(X_test)
+        st.write("R2 Score: ", r2_score(y_test, pred))
+        st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
+        st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
+        st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
+    except:
+        st.write("Preencha todos os parâmetros")
+
+    
+    # Scatter Plot
+    try:
+        plt.scatter(y_test,pred)
+        plt.xlabel("Real")
+        plt.ylabel("Predictions")
+        st.pyplot()
+    except:
+        pass
+
+    # Distribuition Plot
+    try:
+        ibins = st.number_input("bins: ",min_value=1,step=1)
+        sns.distplot((y_test-pred),bins=int(ibins))
+        plt.xlabel("Target")
+        st.pyplot()
+    except:
+        pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
