@@ -13,7 +13,7 @@ ML_option = ""
 
 ########################################
 # Machine Learning Algorithms
-st.sidebar.title("Machine Learning")
+st.sidebar.title("Machine Learning Models")
 super_unsuper = st.sidebar.radio("Choose a model", ("Supervised Learning", "Unsupervised Learning"))
 if super_unsuper == "Supervised Learning":
     super_regre_class = st.sidebar.radio("Choose a type", ("Regression", "Classification"))
@@ -29,7 +29,7 @@ else:
 
 
 
-st.title("Put your title here.")
+st.title("Machine Learning Analysis")
 
 def TakeFile():
     uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
@@ -37,43 +37,52 @@ def TakeFile():
         data = pd.read_csv(uploaded_file)
         return data
 
-data_csv = TakeFile()
-if st.checkbox("Show all data"):
-    st.write(data_csv)
+def TakeFeatures(dataframe, colunas):
+    df_X = dataframe[[colunas[0]]]
+    for i in range(1,len(colunas)):
+        df_X = df_X.join(dataframe[[colunas[i]]])
+    return df_X
+
+def TakeTarget(dataframe, colunas):
+    df_X = dataframe[[colunas[0]]]
+    for i in range(1,len(colunas)):
+        df_X = df_X.join(dataframe[[colunas[i]]])
+    return df_X
+
+try:
+    data_csv = TakeFile()
+    st.write(data_csv.head())
+except:
+    st.write("Adicione um dataset.")
+
+X_features = st.text_input("Features: ").split()
+y_target = st.text_input("Target: ").split()
+
+try:
+    data_feature = TakeFeatures(data_csv, X_features)
+    data_target = TakeTarget(data_csv, y_target)
+    st.write("Features", data_feature.head(), "Target",data_target.head())
+except:
+    st.write("Não foi possível carregar feature e target.")
+
+lr_ts = st.number_input("Test size: ")
+lr_rs = st.number_input("Random state: ")
+
+try:
+    X_train, X_test, y_train, y_test = train_test_split(data_feature, data_target, test_size=lr_ts, random_state=int(lr_rs))
+except:
+    st.write("Não possivel separar os dados")
 
 
 
-
-
-
-#### VARIABLES
-# X = None
-# y = None
-# X_train = None
-# X_test = None
-# y_train = None
-# y_test = None
-# test_size = 0.3
-# random_state = 101
 
 ########################################
 # LINEAR REGRESSION
 if ML_option == "Linear Regression":
-    X_features = st.text_input("Features: ")
-    y_target = st.text_input("Target: ")
-    lr_ts = st.number_input("Test size: ")
-    lr_rs = st.number_input("Random state: ")
-    try:
-        X = data_csv[["{}".format(X_features)]]
-        y = data_csv[["{}".format(y_target)]]
-
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=lr_ts, random_state=int(lr_rs))
-    except:
-        pass
     try:
         linReg = LinearRegression()
         linReg.fit(X_train, y_train)
         pred = linReg.predict(X_test)
-        st.write(r2_score(y_test, pred))
+        st.write("R2 Score: ", r2_score(y_test, pred))
     except:
         st.write("Preencha todos os parâmetros")
