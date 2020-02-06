@@ -5,6 +5,10 @@ from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble import RandomForestRegressor 
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
 from sklearn.svm import SVR
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -31,7 +35,7 @@ if super_unsuper == "Supervised Learning":
     if super_regre_class == "Regression":
         ML_option = st.sidebar.radio("Choose a regressor", ("Linear Regression", "KNN Regression", "Decision Tree Regressor","Random Forest Regressor", "Naive Bayes", "Support Vector Regression"))
     else:
-        pass
+        ML_option = st.sidebar.radio("", ("Logistic Regression", "KNN Classifier", "Decision Tree Classifier", "Random Forest", "Linear Discriminant Analysis", "Naive Bayes","Support Vector Classifier"))
 else:
     pass
 ########################################
@@ -294,3 +298,25 @@ if ML_option == "Random Forest Regressor":
 
 
 ##########################################################
+########################################
+# CLASSIFICATION
+
+if ML_option == "Logistic Regression":
+    # Fit the model and predict X_test. Show some analysis.
+
+    try:
+        logReg = LogisticRegression()
+        logReg.fit(X_train, y_train)
+        pred = logReg.predict(X_test)
+        st.write('R2 Score: ', r2_score(y_test, pred))
+        st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
+        st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
+        st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
+        st.write('Accuracy of Logistic Regression on training set: ', logReg.score(X_train, y_train))
+        st.write('Accuracy of Logistic Regression  on test set: ', logReg.score(X_test, y_test))
+        st.write('Confusion Matrix:', confusion_matrix(y_test,pred))
+        st.write("\n")
+        st.subheader("Classificarion Report")
+        st.text(classification_report(y_test,pred))
+    except:
+        st.write("Preencha todos os parâmetros")
