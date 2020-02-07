@@ -157,6 +157,7 @@ if ML_option == "Linear Regression":
     
         # Scatter Plot
         plt.scatter(y_test,pred)
+        plt.title("Scatter Plot")
         plt.xlabel("Real")
         plt.ylabel("Predictions")
         st.pyplot()
@@ -164,6 +165,7 @@ if ML_option == "Linear Regression":
         # Distribuition Plot
         ibins = st.number_input("bins: ",min_value=1,step=1)
         sns.distplot((y_test-pred),bins=int(ibins))
+        plt.title("Distribution Plot")
         plt.xlabel("Target")
         st.pyplot()
     except:
@@ -192,6 +194,7 @@ if ML_option == "KNN Regression":
     
         # Scatter Plot
         plt.scatter(y_test,pred)
+        plt.title("Scatter Plot")
         plt.xlabel("Real")
         plt.ylabel("Predictions")
         st.pyplot()
@@ -199,6 +202,7 @@ if ML_option == "KNN Regression":
         # Distribuition Plot
         ibins = st.number_input("bins: ",min_value=1,step=1)
         sns.distplot((y_test-pred),bins=int(ibins))
+        plt.title("Distribution Plot")
         plt.xlabel("Target")
         st.pyplot()
     except:
@@ -225,6 +229,7 @@ if ML_option == "Decision Tree Regressor":
 
         # Scatter Plot
         plt.scatter(y_test,pred)
+        plt.title("Scatter Plot")
         plt.xlabel("Real")
         plt.ylabel("Predictions")
         st.pyplot()
@@ -232,6 +237,7 @@ if ML_option == "Decision Tree Regressor":
         # Distribuition Plot
         ibins = st.number_input("bins: ",min_value=1,step=1)
         sns.distplot((y_test-[pred]),bins=int(ibins))
+        plt.title("Distribution Plot")
         plt.xlabel("Target")
         st.pyplot()
     except:
@@ -261,6 +267,7 @@ if ML_option == "Random Forest Regressor":
     
         # Scatter Plot
         plt.scatter(y_test,pred)
+        plt.title("Scatter Plot")
         plt.xlabel("Real")
         plt.ylabel("Predictions")
         st.pyplot()
@@ -268,6 +275,7 @@ if ML_option == "Random Forest Regressor":
         # Distribuition Plot
         ibins = st.number_input("bins: ",min_value=1,step=1)
         sns.distplot((y_test-[pred]),bins=int(ibins))
+        plt.title("Distribution Plot")
         plt.xlabel("Target")
         st.pyplot()
     except:
@@ -296,6 +304,7 @@ if ML_option == "Bayesian Ridge Regression":
     
         # Scatter Plot
         plt.scatter(y_test,pred)
+        plt.title("Scatter Plot")
         plt.xlabel("Real")
         plt.ylabel("Predictions")
         st.pyplot()
@@ -303,6 +312,7 @@ if ML_option == "Bayesian Ridge Regression":
         # Distribuition Plot
         ibins = st.number_input("bins: ",min_value=1,step=1)
         sns.distplot((y_test-[pred]),bins=int(ibins))
+        plt.title("Distribution Plot")
         plt.xlabel("Target")
         st.pyplot()
     except:
@@ -333,6 +343,7 @@ if ML_option == "Support Vector Regression":
 
         # Scatter Plot
         plt.scatter(y_test,pred)
+        plt.title("Scatter Plot")
         plt.xlabel("Real")
         plt.ylabel("Predictions")
         st.pyplot()
@@ -340,6 +351,7 @@ if ML_option == "Support Vector Regression":
         # Distribuition Plot
         ibins = st.number_input("bins: ",min_value=1,step=1)
         sns.distplot((y_test-[pred]),bins=int(ibins))
+        plt.title("Distribution Plot")
         plt.xlabel("Target")
         st.pyplot()
     except:
@@ -368,10 +380,13 @@ if ML_option == "Logistic Regression":
         st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
         st.write('Accuracy of Logistic Regression on training set: ', logReg.score(X_train, y_train))
         st.write('Accuracy of Logistic Regression  on test set: ', logReg.score(X_test, y_test))
+        
+        # Confusion matrix
         plot_confusion_matrix(y_test,pred, figsize=(7,5), cmap="PuBuGn")
         bottom,top = plt.ylim()
         plt.ylim(bottom+0.5,top-0.5)
         st.pyplot()
+        
         st.subheader("Classificarion Report")
         st.text(classification_report(y_test,pred))
     except:
