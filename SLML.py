@@ -146,40 +146,28 @@ if ML_option == "Linear Regression":
         st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
         st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
         st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
-    except:
-        st.write("Preencha todos os parâmetros")
-
-    # Show features coefficient
-    try:
+        
+        # Show features coefficient
         coeff_df = pd.DataFrame(linReg.coef_,index=["Coefficient"] ,columns=[data_feature.columns])
         st.write(coeff_df)
-    except:
-        pass
 
-    # Learning curve
-    try:
+        # Learning curve
         skplt.plot_learning_curve(linReg, X_train, y_train)
         st.pyplot()
-    except:
-        pass
     
-    # Scatter Plot
-    try:
+        # Scatter Plot
         plt.scatter(y_test,pred)
         plt.xlabel("Real")
         plt.ylabel("Predictions")
         st.pyplot()
-    except:
-        pass
-
-    # Distribuition Plot
-    try:
+    
+        # Distribuition Plot
         ibins = st.number_input("bins: ",min_value=1,step=1)
         sns.distplot((y_test-pred),bins=int(ibins))
         plt.xlabel("Target")
         st.pyplot()
     except:
-        pass
+        st.write("Preencha todos os parâmetros")
 
 
 ########################################
@@ -197,33 +185,24 @@ if ML_option == "KNN Regression":
         st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
         st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
         st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
-    except:
-        st.write("Preencha todos os parâmetros")
-
-    # Learning curve
-    try:
+    
+        # Learning curve
         skplt.plot_learning_curve(KNNReg, X_train, y_train)
         st.pyplot()
-    except:
-        pass
     
-    # Scatter Plot
-    try:
+        # Scatter Plot
         plt.scatter(y_test,pred)
         plt.xlabel("Real")
         plt.ylabel("Predictions")
         st.pyplot()
-    except:
-        pass
 
-    # Distribuition Plot
-    try:
+        # Distribuition Plot
         ibins = st.number_input("bins: ",min_value=1,step=1)
         sns.distplot((y_test-pred),bins=int(ibins))
         plt.xlabel("Target")
         st.pyplot()
     except:
-        pass
+        st.write("Preencha todos os parâmetros")
 
 
 ########################################
@@ -239,33 +218,24 @@ if ML_option == "Decision Tree Regressor":
         st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
         st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
         st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
-    except:
-        st.write("Preencha todos os parâmetros")
 
-    # Learning curve
-    try:
+        # Learning curve
         skplt.plot_learning_curve(DTreeReg, X_train, y_train)
         st.pyplot()
-    except:
-        pass
 
-    # Scatter Plot
-    try:
+        # Scatter Plot
         plt.scatter(y_test,pred)
         plt.xlabel("Real")
         plt.ylabel("Predictions")
         st.pyplot()
-    except:
-        pass
 
-    # Distribuition Plot
-    try:
+        # Distribuition Plot
         ibins = st.number_input("bins: ",min_value=1,step=1)
         sns.distplot((y_test-[pred]),bins=int(ibins))
         plt.xlabel("Target")
         st.pyplot()
     except:
-        pass
+        st.write("Preencha todos os parâmetros")
 
 
 ########################################
@@ -284,33 +254,24 @@ if ML_option == "Random Forest Regressor":
         st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
         st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
         st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
-    except:
-        st.write("Preencha todos os parâmetros")
 
-    # Learning curve
-    try:
+        # Learning curve
         skplt.plot_learning_curve(RForest, X_train, y_train)
         st.pyplot()
-    except:
-        pass
     
-    # Scatter Plot
-    try:
+        # Scatter Plot
         plt.scatter(y_test,pred)
         plt.xlabel("Real")
         plt.ylabel("Predictions")
         st.pyplot()
-    except:
-        pass
 
-    # Distribuition Plot
-    try:
+        # Distribuition Plot
         ibins = st.number_input("bins: ",min_value=1,step=1)
         sns.distplot((y_test-[pred]),bins=int(ibins))
         plt.xlabel("Target")
         st.pyplot()
     except:
-        pass
+        st.write("Preencha todos os parâmetros")
 
 
 ########################################
@@ -328,33 +289,24 @@ if ML_option == "Bayesian Ridge Regression":
         st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
         st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
         st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
-    except:
-        st.write("Preencha todos os parâmetros")
 
-    # Learning curve
-    try:
+        # Learning curve
         skplt.plot_learning_curve(BayRReg, X_train, y_train)
         st.pyplot()
-    except:
-        pass
     
-    # Scatter Plot
-    try:
+        # Scatter Plot
         plt.scatter(y_test,pred)
         plt.xlabel("Real")
         plt.ylabel("Predictions")
         st.pyplot()
-    except:
-        pass
 
-    # Distribuition Plot
-    try:
+        # Distribuition Plot
         ibins = st.number_input("bins: ",min_value=1,step=1)
         sns.distplot((y_test-[pred]),bins=int(ibins))
         plt.xlabel("Target")
         st.pyplot()
     except:
-        pass
+        st.write("Preencha todos os parâmetros")
 
 
 ########################################
@@ -374,33 +326,24 @@ if ML_option == "Support Vector Regression":
         st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
         st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
         st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
-    except:
-        st.write("Preencha todos os parâmetros")
 
-    # Learning curve
-    try:
+        # Learning curve
         skplt.plot_learning_curve(SVReg, X_train, y_train)
         st.pyplot()
-    except:
-        pass
 
-    # Scatter Plot
-    try:
+        # Scatter Plot
         plt.scatter(y_test,pred)
         plt.xlabel("Real")
         plt.ylabel("Predictions")
         st.pyplot()
-    except:
-        pass
 
-    # Distribuition Plot
-    try:
+        # Distribuition Plot
         ibins = st.number_input("bins: ",min_value=1,step=1)
         sns.distplot((y_test-[pred]),bins=int(ibins))
         plt.xlabel("Target")
         st.pyplot()
     except:
-        pass
+        st.write("Preencha todos os parâmetros")
     
 
 
@@ -408,23 +351,8 @@ if ML_option == "Support Vector Regression":
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ##########################################################
-########################################
+##########################################################
 # CLASSIFICATION
 
 if ML_option == "Logistic Regression":
