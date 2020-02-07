@@ -1,6 +1,7 @@
 import streamlit as st 
 import pandas as pd
 import numpy as np
+
 from sklearn.linear_model import LinearRegression 
 from sklearn.linear_model import BayesianRidge
 from sklearn.neighbors import KNeighborsRegressor
@@ -16,6 +17,11 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import r2_score
 from sklearn import metrics
+
+import scikitplot.plotters as skplt 
+from scikitplot.metrics import plot_confusion_matrix
+#from scikitplot.metrics import plo
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -149,6 +155,13 @@ if ML_option == "Linear Regression":
         st.write(coeff_df)
     except:
         pass
+
+    # Learning curve
+    try:
+        skplt.plot_learning_curve(linReg, X_train, y_train)
+        st.pyplot()
+    except:
+        pass
     
     # Scatter Plot
     try:
@@ -187,6 +200,12 @@ if ML_option == "KNN Regression":
     except:
         st.write("Preencha todos os parâmetros")
 
+    # Learning curve
+    try:
+        skplt.plot_learning_curve(KNNReg, X_train, y_train)
+        st.pyplot()
+    except:
+        pass
     
     # Scatter Plot
     try:
@@ -223,7 +242,13 @@ if ML_option == "Decision Tree Regressor":
     except:
         st.write("Preencha todos os parâmetros")
 
-    
+    # Learning curve
+    try:
+        skplt.plot_learning_curve(DTreeReg, X_train, y_train)
+        st.pyplot()
+    except:
+        pass
+
     # Scatter Plot
     try:
         plt.scatter(y_test,pred)
@@ -262,6 +287,12 @@ if ML_option == "Random Forest Regressor":
     except:
         st.write("Preencha todos os parâmetros")
 
+    # Learning curve
+    try:
+        skplt.plot_learning_curve(RForest, X_train, y_train)
+        st.pyplot()
+    except:
+        pass
     
     # Scatter Plot
     try:
@@ -300,6 +331,12 @@ if ML_option == "Bayesian Ridge Regression":
     except:
         st.write("Preencha todos os parâmetros")
 
+    # Learning curve
+    try:
+        skplt.plot_learning_curve(BayRReg, X_train, y_train)
+        st.pyplot()
+    except:
+        pass
     
     # Scatter Plot
     try:
@@ -340,7 +377,13 @@ if ML_option == "Support Vector Regression":
     except:
         st.write("Preencha todos os parâmetros")
 
-    
+    # Learning curve
+    try:
+        skplt.plot_learning_curve(SVReg, X_train, y_train)
+        st.pyplot()
+    except:
+        pass
+
     # Scatter Plot
     try:
         plt.scatter(y_test,pred)
@@ -358,7 +401,7 @@ if ML_option == "Support Vector Regression":
         st.pyplot()
     except:
         pass
-
+    
 
 
 
@@ -397,8 +440,10 @@ if ML_option == "Logistic Regression":
         st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
         st.write('Accuracy of Logistic Regression on training set: ', logReg.score(X_train, y_train))
         st.write('Accuracy of Logistic Regression  on test set: ', logReg.score(X_test, y_test))
-        st.write('Confusion Matrix:', confusion_matrix(y_test,pred))
-        st.write("\n")
+        plot_confusion_matrix(y_test,pred, figsize=(7,5), cmap="PuBuGn")
+        bottom,top = plt.ylim()
+        plt.ylim(bottom+0.5,top-0.5)
+        st.pyplot()
         st.subheader("Classificarion Report")
         st.text(classification_report(y_test,pred))
     except:
