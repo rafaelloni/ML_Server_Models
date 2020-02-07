@@ -8,6 +8,13 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble import RandomForestRegressor 
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import SGDClassifier
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
@@ -18,6 +25,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import r2_score
 from sklearn import metrics
 
+from sklearn.pipeline import Pipeline
 import scikitplot.plotters as skplt 
 from scikitplot.metrics import plot_confusion_matrix
 from scikitplot.metrics import plot_roc
@@ -44,7 +52,7 @@ if super_unsuper == "Supervised Learning":
     if super_regre_class == "Regression":
         ML_option = st.sidebar.radio("Choose a regressor", ("Linear Regression", "KNN Regression", "Decision Tree Regressor","Random Forest Regressor", "Bayesian Ridge Regression", "Support Vector Regression"))
     else:
-        ML_option = st.sidebar.radio("Choose a classifier", ("Logistic Regression", "KNN Classifier", "Decision Tree Classifier", "Random Forest", "Linear Discriminant Analysis", "Naive Bayes","Support Vector Classifier"))
+        ML_option = st.sidebar.radio("Choose a classifier", ("Logistic Regression", "KNN Classifier", "Decision Tree Classifier", "Random Forest Classifier", "Linear Discriminant Analysis", "Naive Bayes","Support Vector Classifier","Pipeline"))
 else:
     pass
 ########################################
@@ -369,6 +377,9 @@ if ML_option == "Support Vector Regression":
 ##########################################################
 # CLASSIFICATION
 
+########################################
+# LOGISTIC REGRESSION
+########################################
 if ML_option == "Logistic Regression":
     # Fit the model and predict X_test. Show some analysis.
 
@@ -399,4 +410,211 @@ if ML_option == "Logistic Regression":
 
     # plot_calibration_curve(y_test, [pred])
     # st.pyplot()
+
+########################################
+# KNN CLASSIFIER
+########################################        
+if ML_option == "KNN Classifier":
+    # Fit the model and predict X_test. Show some analysis.
+    try:
+        st.subheader("KNN Parameters")
+        Neigh = st.number_input("Number of neighbors: ", min_value=1, step=1)
+        KNNCla = KNeighborsClassifier(n_neighbors=Neigh)
+        KNNCla.fit(X_train, y_train)
+        pred = KNNCla.predict(X_test)
+        st.write("teste")
+        st.write('R2 Score: ', r2_score(y_test, pred))
+        st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
+        st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
+        st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
+        st.write('Accuracy of KNN Classifier on training set: ', KNNCla.score(X_train, y_train))
+        st.write('Accuracy of KNN Classifier on test set: ', KNNCla.score(X_test, y_test))
         
+        st.subheader("Classificarion Report")
+        st.text(classification_report(y_test,pred))
+
+        #Confusion matrix
+        plot_confusion_matrix(y_test,pred, figsize=(7,5), cmap="PuBuGn")
+        bottom,top = plt.ylim()
+        plt.ylim(bottom+0.5,top-0.5)
+        st.pyplot()
+    except:
+        st.write("Preencha todos os parâmetros")
+
+    # plot_calibration_curve(y_test, [pred])
+    # st.pyplot()        
+
+########################################
+# DECISION TREE CLASSIFIER
+########################################  
+if ML_option == "Decision Tree Classifier":
+    try:
+        DTreeCla = DecisionTreeRegressor()
+        DTreeCla.fit(X_train, y_train)
+        pred = DTreeCla.predict(X_test)
+        st.write("R2 Score: ", r2_score(y_test, pred))
+        st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
+        st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
+        st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
+        st.write('Accuracy of Decision Tree Classifier on training set: ', DTreeCla.score(X_train, y_train))
+        st.write('Accuracy of Decision Tree Classifier on test set: ', DTreeCla.score(X_test, y_test))
+            
+        st.subheader("Classificarion Report")
+        st.text(classification_report(y_test,pred))
+
+            #Confusion matrix
+        plot_confusion_matrix(y_test,pred, figsize=(7,5), cmap="PuBuGn")
+        bottom,top = plt.ylim()
+        plt.ylim(bottom+0.5,top-0.5)
+        st.pyplot()
+    except:
+        st.write("Preencha todos os parâmetros")
+
+########################################
+# RANDOM FOREST CLASSIFIER
+######################################## 
+if ML_option == "Random Forest Classifier":
+    # Fit the model and predict X_test. Show some analysis.
+    try:
+        st.subheader("Random Forest Parameters")
+        Nestim = st.number_input("Number of estimators: ", min_value=1, step=1)
+        RanStaFor = st.number_input("Random state for random forest model: ", min_value=1, step=1)
+        RForest = RandomForestClassifier(n_estimators=Nestim, random_state=RanStaFor)
+        RForest.fit(X_train, y_train)
+        pred = RForest.predict(X_test)
+        st.write("R2 Score: ", r2_score(y_test, pred))
+        st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
+        st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
+        st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
+        st.write('Accuracy of Decision Tree Classifier on training set: ', RForest.score(X_train, y_train))
+        st.write('Accuracy of Decision Tree Classifier on test set: ', RForest.score(X_test, y_test))
+            
+        st.subheader("Classificarion Report")
+        st.text(classification_report(y_test,pred))
+
+            #Confusion matrix
+        plot_confusion_matrix(y_test,pred, figsize=(7,5), cmap="PuBuGn")
+        bottom,top = plt.ylim()
+        plt.ylim(bottom+0.5,top-0.5)
+        st.pyplot()
+
+    except:
+        st.write("Preencha todos os parâmetros")
+
+########################################
+# LINEAR DISCRIMINANT CLASSIFIER
+######################################## 
+if ML_option == "Linear Discriminant Analysis":
+    # Fit the model and predict X_test. Show some analysis.
+    try:
+        lda = LinearDiscriminantAnalysis()
+        lda.fit(X_train, y_train)
+        pred = lda.predict(X_test)
+        st.write("R2 Score: ", r2_score(y_test, pred))
+        st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
+        st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
+        st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
+        st.write('Accuracy of Decision Tree Classifier on training set: ', lda.score(X_train, y_train))
+        st.write('Accuracy of Decision Tree Classifier on test set: ', lda.score(X_test, y_test))
+            
+        st.subheader("Classificarion Report")
+        st.text(classification_report(y_test,pred))
+
+            #Confusion matrix
+        plot_confusion_matrix(y_test,pred, figsize=(7,5), cmap="PuBuGn")
+        bottom,top = plt.ylim()
+        plt.ylim(bottom+0.5,top-0.5)
+        st.pyplot()
+
+    except:
+        st.write("Preencha todos os parâmetros")
+
+########################################
+# NAIVE BAYES CLASSIFIER
+######################################## 
+if ML_option == "Naive Bayes":
+    # Fit the model and predict X_test. Show some analysis.
+    try:
+        gnb = GaussianNB()
+        gnb.fit(X_train, y_train)
+        pred = gnb.predict(X_test)
+        st.write("R2 Score: ", r2_score(y_test, pred))
+        st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
+        st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
+        st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
+        st.write('Accuracy of Decision Tree Classifier on training set: ', gnb.score(X_train, y_train))
+        st.write('Accuracy of Decision Tree Classifier on test set: ', gnb.score(X_test, y_test))
+            
+        st.subheader("Classificarion Report")
+        st.text(classification_report(y_test,pred))
+
+            #Confusion matrix
+        plot_confusion_matrix(y_test,pred, figsize=(7,5), cmap="PuBuGn")
+        bottom,top = plt.ylim()
+        plt.ylim(bottom+0.5,top-0.5)
+        st.pyplot()
+
+    except:
+        st.write("Preencha todos os parâmetros")
+
+########################################
+# SUPPORT VECTOR CLASSIFIER
+######################################## 
+if ML_option == "Support Vector Classifier":
+    # Fit the model and predict X_test. Show some analysis.
+    try:
+        svm = SVC()
+        svm.fit(X_train, y_train)
+        pred = svm.predict(X_test)
+        st.write("R2 Score: ", r2_score(y_test, pred))
+        st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
+        st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
+        st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
+        st.write('Accuracy of Decision Tree Classifier on training set: ', svm.score(X_train, y_train))
+        st.write('Accuracy of Decision Tree Classifier on test set: ', svm.score(X_test, y_test))
+            
+        st.subheader("Classificarion Report")
+        st.text(classification_report(y_test,pred))
+
+            #Confusion matrix
+        plot_confusion_matrix(y_test,pred, figsize=(7,5), cmap="PuBuGn")
+        bottom,top = plt.ylim()
+        plt.ylim(bottom+0.5,top-0.5)
+        st.pyplot()
+
+    except:
+        st.write("Preencha todos os parâmetros")
+
+if ML_option == "Pipeline":
+    
+    pipe_lr = Pipeline( [ ('scl', StandardScaler()), ('clf', LogisticRegression()) ] )
+    pipe_knn = Pipeline([('scl', StandardScaler()), ('clf', KNeighborsClassifier())])
+    pipe_dt = Pipeline([('scl', StandardScaler()), ('clf', DecisionTreeClassifier())])
+    pipe_rand = Pipeline([('scl', StandardScaler()),('clf',RandomForestClassifier())])
+    pipe_lda = Pipeline([('scl', StandardScaler()),('clf', LinearDiscriminantAnalysis())])
+    pipe_gnb = Pipeline([("scl", StandardScaler()),('clf', GaussianNB())])
+    pipe_SVM = Pipeline([("scl", StandardScaler()), ('clf',SVC())])
+
+    pipelines = [pipe_lr, pipe_knn, pipe_dt, pipe_rand, pipe_lda, pipe_gnb, pipe_SVM]
+
+    pipe_dict = {0: "Logistic Regression", 1: 'KNN Classifier', 2: 'Decision Tree Classifier', 3: 'Random Forest Classifier', 4: 'Linear Discriminant Analysis',
+            5: "Naive Bayes", 6: "Support Vector Classifier"}
+
+    for pipe in pipelines:
+        pipe.fit(X_train, y_train)
+    
+    for idx, val in enumerate(pipelines):
+        st.write('%s pipeline test accuracy: ' % (pipe_dict[idx]), round(val.score(X_test, y_test),4))
+    # para cada modelo treinado obtem val score
+    best_acc = 0.0
+    best_clf = 0
+    best_pipe = ''
+
+    for idx, val in enumerate(pipelines):
+    # Descobre o melhor val.score e armazen em best_clf
+        if val.score(X_test, y_test) > best_acc:
+            best_acc = val.score(X_test, y_test)
+            best_pipe = val
+            best_clf = idx
+    st.write('\n')        
+    st.subheader('Classifier with best accuracy: %s' % pipe_dict[best_clf])    
