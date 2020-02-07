@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression 
+from sklearn.linear_model import BayesianRidge
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble import RandomForestRegressor 
 from sklearn.tree import DecisionTreeRegressor
@@ -33,9 +34,9 @@ super_unsuper = st.sidebar.radio("Choose a model", ("Supervised Learning", "Unsu
 if super_unsuper == "Supervised Learning":
     super_regre_class = st.sidebar.radio("Choose a type", ("Regression", "Classification"))
     if super_regre_class == "Regression":
-        ML_option = st.sidebar.radio("Choose a regressor", ("Linear Regression", "KNN Regression", "Decision Tree Regressor","Random Forest Regressor", "Naive Bayes", "Support Vector Regression"))
+        ML_option = st.sidebar.radio("Choose a regressor", ("Linear Regression", "KNN Regression", "Decision Tree Regressor","Random Forest Regressor", "Bayesian Ridge Regression", "Support Vector Regression"))
     else:
-        ML_option = st.sidebar.radio("", ("Logistic Regression", "KNN Classifier", "Decision Tree Classifier", "Random Forest", "Linear Discriminant Analysis", "Naive Bayes","Support Vector Classifier"))
+        ML_option = st.sidebar.radio("Choose a classifier", ("Logistic Regression", "KNN Classifier", "Decision Tree Classifier", "Random Forest", "Linear Discriminant Analysis", "Naive Bayes","Support Vector Classifier"))
 else:
     pass
 ########################################
@@ -128,6 +129,7 @@ except:
 
 ########################################
 # LINEAR REGRESSION
+########################################
 if ML_option == "Linear Regression":
     # Fit the model and predict X_test. Show some analysis.
     try:
@@ -167,7 +169,9 @@ if ML_option == "Linear Regression":
         pass
 
 
+########################################
 # KNN REGRESSION
+########################################
 if ML_option == "KNN Regression":
     # Fit the model and predict X_test. Show some analysis.
     try:
@@ -203,7 +207,9 @@ if ML_option == "KNN Regression":
         pass
 
 
+########################################
 # DECISION TREE REGRESSOR
+########################################
 if ML_option == "Decision Tree Regressor":
     # Fit the model and predict X_test. Show some analysis.
     try:
@@ -237,7 +243,9 @@ if ML_option == "Decision Tree Regressor":
         pass
 
 
+########################################
 # RANDOM FOREST REGRESSION
+########################################
 if ML_option == "Random Forest Regressor":
     # Fit the model and predict X_test. Show some analysis.
     try:
@@ -274,7 +282,82 @@ if ML_option == "Random Forest Regressor":
         pass
 
 
+########################################
+# BAYESIAN RIDGE REGRESSION
+########################################
+if ML_option == "Bayesian Ridge Regression":
+    # Fit the model and predict X_test. Show some analysis.
+    try:
+        st.subheader("Bayesian Ridge Parameters")
+        Niter = st.number_input("Number of iterations: ", min_value=1, step=1)
+        BayRReg = BayesianRidge(n_iter=Niter)
+        BayRReg.fit(X_train, y_train)
+        pred = BayRReg.predict(X_test)
+        st.write("R2 Score: ", r2_score(y_test, pred))
+        st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
+        st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
+        st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
+    except:
+        st.write("Preencha todos os parâmetros")
 
+    
+    # Scatter Plot
+    try:
+        plt.scatter(y_test,pred)
+        plt.xlabel("Real")
+        plt.ylabel("Predictions")
+        st.pyplot()
+    except:
+        pass
+
+    # Distribuition Plot
+    try:
+        ibins = st.number_input("bins: ",min_value=1,step=1)
+        sns.distplot((y_test-[pred]),bins=int(ibins))
+        plt.xlabel("Target")
+        st.pyplot()
+    except:
+        pass
+
+
+########################################
+# SUPPORT VECTOR REGRESSION
+########################################
+if ML_option == "Support Vector Regression":
+    # Fit the model and predict X_test. Show some analysis.
+    try:
+        st.subheader("Support Vector Parameters")
+        Ngamma = st.number_input("gamma: ", min_value=0.01, step=0.01)
+        Cvalue = st.number_input("C: ", min_value=0.1, step=0.1)
+        Evalue = st.number_input("epsilon: ", min_value=0.1, step=0.1)
+        SVReg = SVR(gamma=Ngamma, C=Cvalue, epsilon=Evalue)
+        SVReg.fit(X_train, y_train)
+        pred = SVReg.predict(X_test)
+        st.write("R2 Score: ", r2_score(y_test, pred))
+        st.write('Mean Absolute Error (MAE):', metrics.mean_absolute_error(y_test, pred))
+        st.write('Mean Squared Error (MSE):', metrics.mean_squared_error(y_test, pred))
+        st.write('Root Mean Squared Error (RMSE):', np.sqrt(metrics.mean_squared_error(y_test, pred)))
+    except:
+        st.write("Preencha todos os parâmetros")
+
+    
+    # Scatter Plot
+    try:
+        plt.scatter(y_test,pred)
+        plt.xlabel("Real")
+        plt.ylabel("Predictions")
+        st.pyplot()
+    except:
+        pass
+
+    # Distribuition Plot
+    try:
+        ibins = st.number_input("bins: ",min_value=1,step=1)
+        sns.distplot((y_test-[pred]),bins=int(ibins))
+        plt.xlabel("Target")
+        st.pyplot()
+    except:
+        pass
 
 
 
