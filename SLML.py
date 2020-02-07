@@ -237,7 +237,7 @@ if ML_option == "Decision Tree Regressor":
         pass
 
 
-# KNN REGRESSION
+# RANDOM FOREST REGRESSION
 if ML_option == "Random Forest Regressor":
     # Fit the model and predict X_test. Show some analysis.
     try:
