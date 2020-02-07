@@ -20,7 +20,9 @@ from sklearn import metrics
 
 import scikitplot.plotters as skplt 
 from scikitplot.metrics import plot_confusion_matrix
-#from scikitplot.metrics import plo
+from scikitplot.metrics import plot_roc
+from scikitplot.metrics import plot_precision_recall
+from scikitplot.metrics import plot_calibration_curve
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -381,13 +383,20 @@ if ML_option == "Logistic Regression":
         st.write('Accuracy of Logistic Regression on training set: ', logReg.score(X_train, y_train))
         st.write('Accuracy of Logistic Regression  on test set: ', logReg.score(X_test, y_test))
         
+        st.subheader("Classificarion Report")
+        st.text(classification_report(y_test,pred))
+
         # Confusion matrix
         plot_confusion_matrix(y_test,pred, figsize=(7,5), cmap="PuBuGn")
         bottom,top = plt.ylim()
         plt.ylim(bottom+0.5,top-0.5)
         st.pyplot()
+
         
-        st.subheader("Classificarion Report")
-        st.text(classification_report(y_test,pred))
+
     except:
         st.write("Preencha todos os parâmetros")
+
+    # plot_calibration_curve(y_test, [pred])
+    # st.pyplot()
+        
