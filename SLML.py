@@ -618,3 +618,28 @@ if ML_option == "Pipeline":
             best_clf = idx
     st.write('\n')        
     st.subheader('Classifier with best accuracy: %s' % pipe_dict[best_clf])    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###############################################
+
+st.sidebar.markdown("**Help us to improve this application. See the source code below. Follow us!**")
+st.sidebar.markdown("[Source code](https://github.com/rafaelloni/ML_Server_Models)")
+st.sidebar.markdown("**Contributors:**")
+st.sidebar.markdown("[Rafael Loni](https://github.com/rafaelloni)")
+st.sidebar.markdown("[Gabriel Filetti](https://github.com/rafaelloni)")
