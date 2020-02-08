@@ -586,38 +586,40 @@ if ML_option == "Support Vector Classifier":
         st.write("Preencha todos os parâmetros")
 
 if ML_option == "Pipeline":
-    
-    pipe_lr = Pipeline( [ ('scl', StandardScaler()), ('clf', LogisticRegression()) ] )
-    pipe_knn = Pipeline([('scl', StandardScaler()), ('clf', KNeighborsClassifier())])
-    pipe_dt = Pipeline([('scl', StandardScaler()), ('clf', DecisionTreeClassifier())])
-    pipe_rand = Pipeline([('scl', StandardScaler()),('clf',RandomForestClassifier())])
-    pipe_lda = Pipeline([('scl', StandardScaler()),('clf', LinearDiscriminantAnalysis())])
-    pipe_gnb = Pipeline([("scl", StandardScaler()),('clf', GaussianNB())])
-    pipe_SVM = Pipeline([("scl", StandardScaler()), ('clf',SVC())])
+    try:
+        pipe_lr = Pipeline( [ ('scl', StandardScaler()), ('clf', LogisticRegression()) ] )
+        pipe_knn = Pipeline([('scl', StandardScaler()), ('clf', KNeighborsClassifier())])
+        pipe_dt = Pipeline([('scl', StandardScaler()), ('clf', DecisionTreeClassifier())])
+        pipe_rand = Pipeline([('scl', StandardScaler()),('clf',RandomForestClassifier())])
+        pipe_lda = Pipeline([('scl', StandardScaler()),('clf', LinearDiscriminantAnalysis())])
+        pipe_gnb = Pipeline([("scl", StandardScaler()),('clf', GaussianNB())])
+        pipe_SVM = Pipeline([("scl", StandardScaler()), ('clf',SVC())])
 
-    pipelines = [pipe_lr, pipe_knn, pipe_dt, pipe_rand, pipe_lda, pipe_gnb, pipe_SVM]
+        pipelines = [pipe_lr, pipe_knn, pipe_dt, pipe_rand, pipe_lda, pipe_gnb, pipe_SVM]
 
-    pipe_dict = {0: "Logistic Regression", 1: 'KNN Classifier', 2: 'Decision Tree Classifier', 3: 'Random Forest Classifier', 4: 'Linear Discriminant Analysis',
-            5: "Naive Bayes", 6: "Support Vector Classifier"}
+        pipe_dict = {0: "Logistic Regression", 1: 'KNN Classifier', 2: 'Decision Tree Classifier', 3: 'Random Forest Classifier', 4: 'Linear Discriminant Analysis',
+                5: "Naive Bayes", 6: "Support Vector Classifier"}
 
-    for pipe in pipelines:
-        pipe.fit(X_train, y_train)
-    
-    for idx, val in enumerate(pipelines):
-        st.write('%s pipeline test accuracy: ' % (pipe_dict[idx]), round(val.score(X_test, y_test),4))
-    # para cada modelo treinado obtem val score
-    best_acc = 0.0
-    best_clf = 0
-    best_pipe = ''
+        for pipe in pipelines:
+            pipe.fit(X_train, y_train)
 
-    for idx, val in enumerate(pipelines):
-    # Descobre o melhor val.score e armazen em best_clf
-        if val.score(X_test, y_test) > best_acc:
-            best_acc = val.score(X_test, y_test)
-            best_pipe = val
-            best_clf = idx
-    st.write('\n')        
-    st.subheader('Classifier with best accuracy: %s' % pipe_dict[best_clf])    
+        for idx, val in enumerate(pipelines):
+            st.write('%s pipeline test accuracy: ' % (pipe_dict[idx]), round(val.score(X_test, y_test),4))
+        # para cada modelo treinado obtem val score
+        best_acc = 0.0
+        best_clf = 0
+        best_pipe = ''
+
+        for idx, val in enumerate(pipelines):
+        # Descobre o melhor val.score e armazen em best_clf
+            if val.score(X_test, y_test) > best_acc:
+                best_acc = val.score(X_test, y_test)
+                best_pipe = val
+                best_clf = idx
+        st.write('\n')        
+        st.subheader('Classifier with best accuracy: %s' % pipe_dict[best_clf])    
+    except:
+        pass
 
 
 
