@@ -36,6 +36,16 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
+
+#######################
+st.sidebar.title(">>> Litbrench")
+st.sidebar.markdown("**A workbench for machine learning created by Streamlit**")
+
+#######################
+
+
+
+
 ### MENU VARIABLES ###
 super_unsuper = ""
 super_regre_class = ""
@@ -50,7 +60,7 @@ super_unsuper = st.sidebar.radio("Choose a model", ("Supervised Learning", "Unsu
 if super_unsuper == "Supervised Learning":
     super_regre_class = st.sidebar.radio("Choose a type", ("Regression", "Classification"))
     if super_regre_class == "Regression":
-        ML_option = st.sidebar.radio("Choose a regressor", ("Linear Regression", "KNN Regression", "Decision Tree Regressor","Random Forest Regressor", "Bayesian Ridge Regression", "Support Vector Regression"))
+        ML_option = st.sidebar.radio("Choose a regressor", ("Linear Regression", "KNN Regression", "Decision Tree Regressor","Random Forest Regressor", "Bayesian Ridge Regression", "Support Vector Regression", "Pipeline Regression"))
     else:
         ML_option = st.sidebar.radio("Choose a classifier", ("Logistic Regression", "KNN Classifier", "Decision Tree Classifier", "Random Forest Classifier", "Linear Discriminant Analysis", "Naive Bayes","Support Vector Classifier","Pipeline"))
 else:
@@ -96,7 +106,7 @@ try:
     data_csv = GetFile()
     st.write(data_csv.head())
 except:
-    st.write("Adicione um dataset.")
+    st.write("You must upload a dataset.")
 
 
 # Label encoder
@@ -130,7 +140,7 @@ try:
     data_target = GetTarget(data_csv, y_target)
     st.write("Features", data_feature.head(), "Target",data_target.head())
 except:
-    st.write("Não foi possível carregar feature e target.")
+    st.write("Feature and Target cannot be loaded.")
 
 # Train Test Split
 lr_ts = st.number_input("Test size: ")
@@ -138,7 +148,7 @@ lr_rs = st.number_input("Random state: ", min_value=1, step=1)
 try:
     X_train, X_test, y_train, y_test = train_test_split(data_feature, data_target, test_size=lr_ts, random_state=int(lr_rs))
 except:
-    st.write("Não possivel separar os dados")
+    st.write("Data cannot be splitted.")
 ########################################
 
 
@@ -179,7 +189,7 @@ if ML_option == "Linear Regression":
         plt.xlabel("Target")
         st.pyplot()
     except:
-        st.write("Preencha todos os parâmetros")
+        st.write("Fill all parameters.")
 
 
 ########################################
@@ -216,7 +226,7 @@ if ML_option == "KNN Regression":
         plt.xlabel("Target")
         st.pyplot()
     except:
-        st.write("Preencha todos os parâmetros")
+        st.write("Fill all parameters.")
 
 
 ########################################
@@ -251,7 +261,7 @@ if ML_option == "Decision Tree Regressor":
         plt.xlabel("Target")
         st.pyplot()
     except:
-        st.write("Preencha todos os parâmetros")
+        st.write("Fill all parameters.")
 
 
 ########################################
@@ -289,7 +299,7 @@ if ML_option == "Random Forest Regressor":
         plt.xlabel("Target")
         st.pyplot()
     except:
-        st.write("Preencha todos os parâmetros")
+        st.write("Fill all parameters.")
 
 
 ########################################
@@ -326,7 +336,7 @@ if ML_option == "Bayesian Ridge Regression":
         plt.xlabel("Target")
         st.pyplot()
     except:
-        st.write("Preencha todos os parâmetros")
+        st.write("Fill all parameters.")
 
 
 ########################################
@@ -365,8 +375,51 @@ if ML_option == "Support Vector Regression":
         plt.xlabel("Target")
         st.pyplot()
     except:
-        st.write("Preencha todos os parâmetros")
+        st.write("Fill all parameters.")
     
+
+########################################
+# PIPELINE REGRESSION
+########################################
+if ML_option == "Pipeline Regression":
+    try:
+        pipe_lr = Pipeline( [ ('scl', StandardScaler()), ('clf', LinearRegression()) ] )
+        pipe_knn = Pipeline([('scl', StandardScaler()), ('clf', KNeighborsRegressor())])
+        pipe_dt = Pipeline([('scl', StandardScaler()), ('clf', DecisionTreeRegressor())])
+        pipe_rf = Pipeline([('scl', StandardScaler()),('clf', RandomForestRegressor())])
+        pipe_br = Pipeline([('scl', StandardScaler()),('clf', BayesianRidge())])
+        pipe_sv = Pipeline([("scl", StandardScaler()),('clf', SVR())])
+        
+        pipelines = [pipe_lr, pipe_knn, pipe_dt, pipe_rf, pipe_br, pipe_sv]
+
+        pipe_dict = {0: "Linear Regression", 1: 'KNN Regression', 2: 'Decision Tree Regressor', 3: 'Random Forest Regressor', 4: 'Bayesian Ridge Regression',
+                5: "Support Vector Regression"}
+
+        for pipe in pipelines:
+            pipe.fit(X_train, y_train)
+
+        for idx, val in enumerate(pipelines):
+            st.write('%s pipeline test accuracy: ' % (pipe_dict[idx]), round(val.score(X_test, y_test),4))
+        # para cada modelo treinado obtem val score
+        best_acc = 0.0
+        best_clf = 0
+        best_pipe = ''
+
+        for idx, val in enumerate(pipelines):
+        # Descobre o melhor val.score e armazen em best_clf
+            if val.score(X_test, y_test) > best_acc:
+                best_acc = val.score(X_test, y_test)
+                best_pipe = val
+                best_clf = idx
+        st.write('\n')        
+        st.subheader('Regressor with best accuracy: %s' % pipe_dict[best_clf])    
+    except:
+        pass
+
+
+
+
+
 
 
 
@@ -387,14 +440,13 @@ if ML_option == "Logistic Regression":
         logReg = LogisticRegression()
         logReg.fit(X_train, y_train)
         pred = logReg.predict(X_test)
-        st.write('R2 Score: ', round(r2_score(y_test, pred),4))
         st.write('Mean Absolute Error (MAE):', round(metrics.mean_absolute_error(y_test, pred),4))
         st.write('Mean Squared Error (MSE):', round(metrics.mean_squared_error(y_test, pred),4))
         st.write('Root Mean Squared Error (RMSE):', round(np.sqrt(metrics.mean_squared_error(y_test, pred)),4))
         st.write('Accuracy of Logistic Regression on training set: ', round(logReg.score(X_train, y_train),4))
         st.write('Accuracy of Logistic Regression  on test set: ', round(logReg.score(X_test, y_test),4))
         
-        st.subheader("Classificarion Report")
+        st.subheader("Classification Report")
         st.text(classification_report(y_test,pred))
 
         # Confusion matrix
@@ -406,7 +458,7 @@ if ML_option == "Logistic Regression":
         
 
     except:
-        st.write("Preencha todos os parâmetros")
+        st.write("Fill all parameters.")
 
     # plot_calibration_curve(y_test, [pred])
     # st.pyplot()
@@ -423,14 +475,13 @@ if ML_option == "KNN Classifier":
         KNNCla.fit(X_train, y_train)
         pred = KNNCla.predict(X_test)
         st.write("teste")
-        st.write('R2 Score: ', round(r2_score(y_test, pred),4))
         st.write('Mean Absolute Error (MAE):', round(metrics.mean_absolute_error(y_test, pred),4))
         st.write('Mean Squared Error (MSE):', round(metrics.mean_squared_error(y_test, pred),4))
         st.write('Root Mean Squared Error (RMSE):', round(np.sqrt(metrics.mean_squared_error(y_test, pred)),4))
         st.write('Accuracy of KNN Classifier on training set: ', round(KNNCla.score(X_train, y_train),4))
         st.write('Accuracy of KNN Classifier on test set: ', round(KNNCla.score(X_test, y_test),4))
         
-        st.subheader("Classificarion Report")
+        st.subheader("Classification Report")
         st.text(classification_report(y_test,pred))
 
         #Confusion matrix
@@ -439,7 +490,7 @@ if ML_option == "KNN Classifier":
         plt.ylim(bottom+0.5,top-0.5)
         st.pyplot()
     except:
-        st.write("Preencha todos os parâmetros")
+        st.write("Fill all parameters.")
 
     # plot_calibration_curve(y_test, [pred])
     # st.pyplot()        
@@ -452,14 +503,13 @@ if ML_option == "Decision Tree Classifier":
         DTreeCla = DecisionTreeRegressor()
         DTreeCla.fit(X_train, y_train)
         pred = DTreeCla.predict(X_test)
-        st.write("R2 Score: ", round(r2_score(y_test, pred),4))
         st.write('Mean Absolute Error (MAE):', round(metrics.mean_absolute_error(y_test, pred),4))
         st.write('Mean Squared Error (MSE):', round(metrics.mean_squared_error(y_test, pred),4))
         st.write('Root Mean Squared Error (RMSE):', round(np.sqrt(metrics.mean_squared_error(y_test, pred)),4))
         st.write('Accuracy of Decision Tree Classifier on training set: ', round(DTreeCla.score(X_train, y_train),4))
         st.write('Accuracy of Decision Tree Classifier on test set: ', round(DTreeCla.score(X_test, y_test),4))
             
-        st.subheader("Classificarion Report")
+        st.subheader("Classification Report")
         st.text(classification_report(y_test,pred))
 
             #Confusion matrix
@@ -468,7 +518,7 @@ if ML_option == "Decision Tree Classifier":
         plt.ylim(bottom+0.5,top-0.5)
         st.pyplot()
     except:
-        st.write("Preencha todos os parâmetros")
+        st.write("Fill all parameters.")
 
 ########################################
 # RANDOM FOREST CLASSIFIER
@@ -482,14 +532,13 @@ if ML_option == "Random Forest Classifier":
         RForest = RandomForestClassifier(n_estimators=Nestim, random_state=RanStaFor)
         RForest.fit(X_train, y_train)
         pred = RForest.predict(X_test)
-        st.write("R2 Score: ", round(r2_score(y_test, pred),4))
         st.write('Mean Absolute Error (MAE):', round(metrics.mean_absolute_error(y_test, pred),4))
         st.write('Mean Squared Error (MSE):', round(metrics.mean_squared_error(y_test, pred),4))
         st.write('Root Mean Squared Error (RMSE):', round(np.sqrt(metrics.mean_squared_error(y_test, pred)),4))
         st.write('Accuracy of Decision Tree Classifier on training set: ', round(RForest.score(X_train, y_train),4))
         st.write('Accuracy of Decision Tree Classifier on test set: ', round(RForest.score(X_test, y_test),4))
             
-        st.subheader("Classificarion Report")
+        st.subheader("Classification Report")
         st.text(classification_report(y_test,pred))
 
             #Confusion matrix
@@ -499,7 +548,7 @@ if ML_option == "Random Forest Classifier":
         st.pyplot()
 
     except:
-        st.write("Preencha todos os parâmetros")
+        st.write("Fill all parameters.")
 
 ########################################
 # LINEAR DISCRIMINANT CLASSIFIER
@@ -510,14 +559,13 @@ if ML_option == "Linear Discriminant Analysis":
         lda = LinearDiscriminantAnalysis()
         lda.fit(X_train, y_train)
         pred = lda.predict(X_test)
-        st.write("R2 Score: ", round(r2_score(y_test, pred),4))
         st.write('Mean Absolute Error (MAE):', round(metrics.mean_absolute_error(y_test, pred),4))
         st.write('Mean Squared Error (MSE):', round(metrics.mean_squared_error(y_test, pred),4))
         st.write('Root Mean Squared Error (RMSE):', round(np.sqrt(metrics.mean_squared_error(y_test, pred)),4))
         st.write('Accuracy of Decision Tree Classifier on training set: ', round(lda.score(X_train, y_train),4))
         st.write('Accuracy of Decision Tree Classifier on test set: ', round(lda.score(X_test, y_test),4))
             
-        st.subheader("Classificarion Report")
+        st.subheader("Classification Report")
         st.text(classification_report(y_test,pred))
 
             #Confusion matrix
@@ -527,7 +575,7 @@ if ML_option == "Linear Discriminant Analysis":
         st.pyplot()
 
     except:
-        st.write("Preencha todos os parâmetros")
+        st.write("Fill all parameters.")
 
 ########################################
 # NAIVE BAYES CLASSIFIER
@@ -538,14 +586,13 @@ if ML_option == "Naive Bayes":
         gnb = GaussianNB()
         gnb.fit(X_train, y_train)
         pred = gnb.predict(X_test)
-        st.write("R2 Score: ", round(r2_score(y_test, pred),4))
         st.write('Mean Absolute Error (MAE):', round(metrics.mean_absolute_error(y_test, pred),4))
         st.write('Mean Squared Error (MSE):', round(metrics.mean_squared_error(y_test, pred),4))
         st.write('Root Mean Squared Error (RMSE):', round(np.sqrt(metrics.mean_squared_error(y_test, pred)),4))
         st.write('Accuracy of Decision Tree Classifier on training set: ', round(gnb.score(X_train, y_train),4))
         st.write('Accuracy of Decision Tree Classifier on test set: ', round(gnb.score(X_test, y_test),4))
             
-        st.subheader("Classificarion Report")
+        st.subheader("Classification Report")
         st.text(classification_report(y_test,pred))
 
             #Confusion matrix
@@ -555,7 +602,7 @@ if ML_option == "Naive Bayes":
         st.pyplot()
 
     except:
-        st.write("Preencha todos os parâmetros")
+        st.write("Fill all parameters.")
 
 ########################################
 # SUPPORT VECTOR CLASSIFIER
@@ -566,14 +613,13 @@ if ML_option == "Support Vector Classifier":
         svm = SVC()
         svm.fit(X_train, y_train)
         pred = svm.predict(X_test)
-        st.write("R2 Score: ", round(r2_score(y_test, pred),4))
         st.write('Mean Absolute Error (MAE):', round(metrics.mean_absolute_error(y_test, pred),4))
         st.write('Mean Squared Error (MSE):', round(metrics.mean_squared_error(y_test, pred),4))
         st.write('Root Mean Squared Error (RMSE):', round(np.sqrt(metrics.mean_squared_error(y_test, pred)),4))
         st.write('Accuracy of Decision Tree Classifier on training set: ', round(svm.score(X_train, y_train),4))
         st.write('Accuracy of Decision Tree Classifier on test set: ', round(svm.score(X_test, y_test),4))
             
-        st.subheader("Classificarion Report")
+        st.subheader("Classification Report")
         st.text(classification_report(y_test,pred))
 
             #Confusion matrix
@@ -583,7 +629,7 @@ if ML_option == "Support Vector Classifier":
         st.pyplot()
 
     except:
-        st.write("Preencha todos os parâmetros")
+        st.write("Fill all parameters.")
 
 if ML_option == "Pipeline":
     try:
