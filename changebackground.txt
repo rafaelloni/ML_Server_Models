@@ -1,0 +1,44 @@
+
+import base64
+
+
+
+########################## CHANGE BACKGROUND STYLE ########################
+def bytesTo64(bytes_file, header):
+        encoded = base64.b64encode(bytes_file).decode()
+        base64file = "data:%s;base64,%s" % (header, encoded)
+        return base64file
+
+def setBackground(filename, filetype='image/jpeg'):
+    fig = filename
+    image = open(fig, 'rb').read()
+    image64 = bytesTo64(image, filetype)
+    return image64
+
+def SetStyle():
+    
+    im = "fundo.jpg"
+
+    csstyle = f"""<style> 
+        .stApp{{
+            background:url({setBackground(im, 'image/jpg')}) no-repeat center center;
+            backgroung-size:cover;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }}
+        .reportview-container .main .block-container {{
+            flex:1 1;
+            max-width:1000px;
+            width:100%;
+            padding:5rem 1rem 10rem;
+            box-sizing:border-box
+            }}
+                    </style>
+        """
+    return csstyle
+
+sta = SetStyle()
+st.markdown(sta, unsafe_allow_html=True)
+##########################################################################

@@ -32,6 +32,9 @@ from scikitplot.metrics import plot_roc
 from scikitplot.metrics import plot_precision_recall
 from scikitplot.metrics import plot_calibration_curve
 
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.multioutput import MultiOutputRegressor
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -50,8 +53,6 @@ st.sidebar.markdown("**A workbench for machine learning created by Streamlit**")
 super_unsuper = ""
 super_regre_class = ""
 ML_option = ""
-
-
 
 ########################################
 # Machine Learning Algorithms Menu
@@ -141,6 +142,7 @@ try:
     st.write("Features", data_feature.head(), "Target",data_target.head())
 except:
     st.write("Feature and Target cannot be loaded.")
+
 
 # Train Test Split
 lr_ts = st.number_input("Test size: ")
@@ -310,7 +312,7 @@ if ML_option == "Bayesian Ridge Regression":
     try:
         st.subheader("Bayesian Ridge Parameters")
         Niter = st.number_input("Number of iterations: ", min_value=1, step=1)
-        BayRReg = BayesianRidge(n_iter=Niter)
+        BayRReg = MultiOutputRegressor(BayesianRidge(n_iter=Niter))
         BayRReg.fit(X_train, y_train)
         pred = BayRReg.predict(X_test)
         st.write("R2 Score: ", round(r2_score(y_test, pred),4))
@@ -349,7 +351,7 @@ if ML_option == "Support Vector Regression":
         Ngamma = st.number_input("gamma: ", min_value=0.01, step=0.01)
         Cvalue = st.number_input("C: ", min_value=0.1, step=0.1)
         Evalue = st.number_input("epsilon: ", min_value=0.1, step=0.1)
-        SVReg = SVR(gamma=Ngamma, C=Cvalue, epsilon=Evalue)
+        SVReg = MultiOutputRegressor(SVR(gamma=Ngamma, C=Cvalue, epsilon=Evalue))
         SVReg.fit(X_train, y_train)
         pred = SVReg.predict(X_test)
         st.write("R2 Score: ", round(r2_score(y_test, pred),4))
@@ -387,8 +389,8 @@ if ML_option == "Pipeline Regression":
         pipe_knn = Pipeline([('scl', StandardScaler()), ('clf', KNeighborsRegressor())])
         pipe_dt = Pipeline([('scl', StandardScaler()), ('clf', DecisionTreeRegressor())])
         pipe_rf = Pipeline([('scl', StandardScaler()),('clf', RandomForestRegressor())])
-        pipe_br = Pipeline([('scl', StandardScaler()),('clf', BayesianRidge())])
-        pipe_sv = Pipeline([("scl", StandardScaler()),('clf', SVR())])
+        pipe_br = Pipeline([('scl', StandardScaler()),('clf', MultiOutputRegressor(BayesianRidge()))])
+        pipe_sv = Pipeline([("scl", StandardScaler()),('clf', MultiOutputRegressor(SVR()))])
         
         pipelines = [pipe_lr, pipe_knn, pipe_dt, pipe_rf, pipe_br, pipe_sv]
 
@@ -437,7 +439,7 @@ if ML_option == "Logistic Regression":
     # Fit the model and predict X_test. Show some analysis.
 
     try:
-        logReg = LogisticRegression()
+        logReg = MultiOutputClassifier(LogisticRegression())
         logReg.fit(X_train, y_train)
         pred = logReg.predict(X_test)
         st.write('Mean Absolute Error (MAE):', round(metrics.mean_absolute_error(y_test, pred),4))
@@ -445,16 +447,18 @@ if ML_option == "Logistic Regression":
         st.write('Root Mean Squared Error (RMSE):', round(np.sqrt(metrics.mean_squared_error(y_test, pred)),4))
         st.write('Accuracy of Logistic Regression on training set: ', round(logReg.score(X_train, y_train),4))
         st.write('Accuracy of Logistic Regression  on test set: ', round(logReg.score(X_test, y_test),4))
-        
+
         st.subheader("Classification Report")
         st.text(classification_report(y_test,pred))
 
-        # Confusion matrix
-        plot_confusion_matrix(y_test,pred, figsize=(7,5), cmap="PuBuGn")
-        bottom,top = plt.ylim()
-        plt.ylim(bottom+0.5,top-0.5)
-        st.pyplot()
-
+        try:
+            # Confusion matrix
+            plot_confusion_matrix(y_test,pred, figsize=(7,5), cmap="PuBuGn")
+            bottom,top = plt.ylim()
+            plt.ylim(bottom+0.5,top-0.5)
+            st.pyplot()
+        except:
+            st.write("Confusion matrix do not support multioutput.")
         
 
     except:
@@ -556,7 +560,7 @@ if ML_option == "Random Forest Classifier":
 if ML_option == "Linear Discriminant Analysis":
     # Fit the model and predict X_test. Show some analysis.
     try:
-        lda = LinearDiscriminantAnalysis()
+        lda = MultiOutputClassifier(LinearDiscriminantAnalysis())
         lda.fit(X_train, y_train)
         pred = lda.predict(X_test)
         st.write('Mean Absolute Error (MAE):', round(metrics.mean_absolute_error(y_test, pred),4))
@@ -583,7 +587,7 @@ if ML_option == "Linear Discriminant Analysis":
 if ML_option == "Naive Bayes":
     # Fit the model and predict X_test. Show some analysis.
     try:
-        gnb = GaussianNB()
+        gnb = MultiOutputClassifier(GaussianNB())
         gnb.fit(X_train, y_train)
         pred = gnb.predict(X_test)
         st.write('Mean Absolute Error (MAE):', round(metrics.mean_absolute_error(y_test, pred),4))
@@ -610,7 +614,7 @@ if ML_option == "Naive Bayes":
 if ML_option == "Support Vector Classifier":
     # Fit the model and predict X_test. Show some analysis.
     try:
-        svm = SVC()
+        svm = MultiOutputClassifier(SVC())
         svm.fit(X_train, y_train)
         pred = svm.predict(X_test)
         st.write('Mean Absolute Error (MAE):', round(metrics.mean_absolute_error(y_test, pred),4))
@@ -633,13 +637,13 @@ if ML_option == "Support Vector Classifier":
 
 if ML_option == "Pipeline":
     try:
-        pipe_lr = Pipeline( [ ('scl', StandardScaler()), ('clf', LogisticRegression()) ] )
+        pipe_lr = Pipeline( [ ('scl', StandardScaler()), ('clf', MultiOutputClassifier(LogisticRegression()))])
         pipe_knn = Pipeline([('scl', StandardScaler()), ('clf', KNeighborsClassifier())])
         pipe_dt = Pipeline([('scl', StandardScaler()), ('clf', DecisionTreeClassifier())])
-        pipe_rand = Pipeline([('scl', StandardScaler()),('clf',RandomForestClassifier())])
-        pipe_lda = Pipeline([('scl', StandardScaler()),('clf', LinearDiscriminantAnalysis())])
-        pipe_gnb = Pipeline([("scl", StandardScaler()),('clf', GaussianNB())])
-        pipe_SVM = Pipeline([("scl", StandardScaler()), ('clf',SVC())])
+        pipe_rand = Pipeline([('scl', StandardScaler()),('clf', RandomForestClassifier())])
+        pipe_lda = Pipeline([('scl', StandardScaler()),('clf', MultiOutputClassifier(LinearDiscriminantAnalysis()))])
+        pipe_gnb = Pipeline([("scl", StandardScaler()),('clf', MultiOutputClassifier(GaussianNB()))])
+        pipe_SVM = Pipeline([("scl", StandardScaler()), ('clf', MultiOutputClassifier(SVC()))])
 
         pipelines = [pipe_lr, pipe_knn, pipe_dt, pipe_rand, pipe_lda, pipe_gnb, pipe_SVM]
 
