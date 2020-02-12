@@ -30,8 +30,11 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 
-# Unsuper
+# Unsuper Clustering
 from sklearn.cluster import KMeans
+from sklearn.cluster import MiniBatchKMeans
+from sklearn.cluster import SpectralClustering
+from sklearn.cluster import DBSCAN
 
 # Pipeline
 from sklearn.pipeline import Pipeline
@@ -78,7 +81,7 @@ if super_unsuper == "Supervised Learning":
 else:
     unsuper_cluster_gener = st.sidebar.radio("Choose a type", ("Clustering", "Generation"))
     if unsuper_cluster_gener == "Clustering":
-        ML_option = st.sidebar.radio("Choose a cluster", ("k-medians", "k-medoids", "k-means","Fuzzy C-Means", "Hierarchical Clustering", "Decision Tree"))
+        ML_option = st.sidebar.radio("Choose a cluster", ("k-means","Mini-Batch k-means", "Spectral Clustering", "DBSCAN"))
     else:
         ML_option = st.sidebar.radio("Choose a generator", ("Hidden Markov Models", "Recurrent Neural Nets"))
 
@@ -713,24 +716,6 @@ if ML_option == "Pipeline":
 ######################################## 
 
 ########################################
-# k-medians
-######################################## 
-if ML_option == "k-medians":
-    st.title("Under construction. Coming soon.")
-    image = Image.open("soon.png")
-    st.image(image, width=70)
-
-
-########################################
-# k-medoids
-######################################## 
-if ML_option == "k-medoids":
-    st.title("Under construction. Coming soon.")
-    image = Image.open("soon.png")
-    st.image(image, width=70)
-
-
-########################################
 # k-means
 ######################################## 
 if ML_option == "k-means":
@@ -749,36 +734,76 @@ if ML_option == "k-means":
         bottom,top = plt.ylim()
         plt.ylim(bottom+0.5,top-0.5)
         st.pyplot()
-    except Exception as e:
-        st.write(e)
-
-
-
-########################################
-# Fuzzy C-Means
-######################################## 
-if ML_option == "Fuzzy C-Means":
-    st.title("Under construction. Coming soon.")
-    image = Image.open("soon.png")
-    st.image(image, width=70)
+    except:
+        st.write("Fill all parameters.")
 
 
 ########################################
-# k-medoids
+# Mini-Batch k-means
 ######################################## 
-if ML_option == "Hierarchical Clustering":
-    st.title("Under construction. Coming soon.")
-    image = Image.open("soon.png")
-    st.image(image, width=70)
+if ML_option == "Mini-Batch k-means":
+    try:
+        # Mini Batch parameters
+        Nk = st.number_input("Number of clusters: ", min_value=1, step=1)
+        MBatchClus = MiniBatchKMeans(n_clusters=Nk)
+        MBatchClus.fit(data_feature)
+        pred = MBatchClus.predict(data_feature)
+
+        st.subheader("Classification Report")
+        st.text(classification_report(data_target,pred))
+        
+        #Confusion matrix
+        plot_confusion_matrix(data_target,pred, figsize=(7,5), cmap="PuBuGn")
+        bottom,top = plt.ylim()
+        plt.ylim(bottom+0.5,top-0.5)
+        st.pyplot()
+    except:
+        st.write("Fill all parameters.")
 
 
 ########################################
-# k-medoids
+# Spectral Clustering
 ######################################## 
-if ML_option == "Decision Tree":
-    st.title("Under construction. Coming soon.")
-    image = Image.open("soon.png")
-    st.image(image, width=70)
+if ML_option == "Spectral Clustering":
+    try:
+        # Spectral parameters
+        Nk = st.number_input("Number of clusters: ", min_value=1, step=1)
+        SpecClus = SpectralClustering(n_clusters=Nk, affinity='nearest_neighbors', assign_labels='kmeans')
+        pred = SpecClus.fit_predict(data_feature)
+
+        st.subheader("Classification Report")
+        st.text(classification_report(data_target,pred))
+        
+        #Confusion matrix
+        plot_confusion_matrix(data_target,pred, figsize=(7,5), cmap="PuBuGn")
+        bottom,top = plt.ylim()
+        plt.ylim(bottom+0.5,top-0.5)
+        st.pyplot()
+    except:
+        st.write("Fill all parameters.")
+
+
+########################################
+# DBSCAN
+######################################## 
+if ML_option == "DBSCAN":
+    try:
+        # DBSCAN parameters
+        Neps = st.number_input("Number of eps: ", min_value=0.1, step=0.1)
+        Nsample = st.number_input("Number of samples:", min_value=1, step=1)
+        DBSCANClus = DBSCAN(eps=Neps, min_samples=Nsample)
+        pred = DBSCANClus.fit_predict(data_feature)
+
+        st.subheader("Classification Report")
+        st.text(classification_report(data_target,pred))
+        
+        #Confusion matrix
+        plot_confusion_matrix(data_target,pred, figsize=(7,5), cmap="PuBuGn")
+        bottom,top = plt.ylim()
+        plt.ylim(bottom+0.5,top-0.5)
+        st.pyplot()
+    except:
+        st.write("Fill all parameters.")
 
 
 ########################################
@@ -809,4 +834,4 @@ st.sidebar.markdown("[Source code](https://github.com/rafaelloni/ML_Server_Model
 st.sidebar.markdown("**Contributors:**")
 st.sidebar.markdown("[Rafael Loni](https://github.com/rafaelloni)")
 st.sidebar.markdown("[Gabriel Filetti](https://github.com/GabrielFiletti)")
-st.sidebar.markdown(" ` Version 0.1 ` ")
+st.sidebar.markdown(" ` Version 0.2 ` ")
