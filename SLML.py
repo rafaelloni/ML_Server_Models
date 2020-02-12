@@ -809,3 +809,4 @@ st.sidebar.markdown("[Source code](https://github.com/rafaelloni/ML_Server_Model
 st.sidebar.markdown("**Contributors:**")
 st.sidebar.markdown("[Rafael Loni](https://github.com/rafaelloni)")
 st.sidebar.markdown("[Gabriel Filetti](https://github.com/GabrielFiletti)")
+st.sidebar.markdown(" ` Version 0.1 ` ")
