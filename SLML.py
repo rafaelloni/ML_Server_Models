@@ -1,12 +1,26 @@
+# Imports
 import streamlit as st 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from PIL import Image
 
+# Preprocessing
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+
+# Super Regression
 from sklearn.linear_model import LinearRegression 
 from sklearn.linear_model import BayesianRidge
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.ensemble import RandomForestRegressor 
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.svm import SVR
+
+# Super Classifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
@@ -15,43 +29,40 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
+
+# Unsuper
+from sklearn.cluster import KMeans
+
+# Pipeline
+from sklearn.pipeline import Pipeline
+
+# Multitarget
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.multioutput import MultiOutputRegressor
+
+# Metrics and plot
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
-from sklearn.svm import SVR
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import r2_score
 from sklearn import metrics
-
-from sklearn.pipeline import Pipeline
 import scikitplot.plotters as skplt 
 from scikitplot.metrics import plot_confusion_matrix
 from scikitplot.metrics import plot_roc
 from scikitplot.metrics import plot_precision_recall
 from scikitplot.metrics import plot_calibration_curve
 
-from sklearn.multioutput import MultiOutputClassifier
-from sklearn.multioutput import MultiOutputRegressor
-
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 
 
 #######################
 st.sidebar.title(">>> Litbrench")
 st.sidebar.markdown("**A workbench for machine learning created by Streamlit**")
-
 #######################
-
-
-
 
 ### MENU VARIABLES ###
 super_unsuper = ""
 super_regre_class = ""
+unsuper_cluster_gener = ""
 ML_option = ""
 
 ########################################
@@ -65,15 +76,18 @@ if super_unsuper == "Supervised Learning":
     else:
         ML_option = st.sidebar.radio("Choose a classifier", ("Logistic Regression", "KNN Classifier", "Decision Tree Classifier", "Random Forest Classifier", "Linear Discriminant Analysis", "Naive Bayes","Support Vector Classifier","Pipeline"))
 else:
-    st.sidebar.title("Under construction - coming soon.")
-########################################
-
-
+    unsuper_cluster_gener = st.sidebar.radio("Choose a type", ("Clustering", "Generation"))
+    if unsuper_cluster_gener == "Clustering":
+        ML_option = st.sidebar.radio("Choose a cluster", ("k-medians", "k-medoids", "k-means","Fuzzy C-Means", "Hierarchical Clustering", "Decision Tree"))
+    else:
+        ML_option = st.sidebar.radio("Choose a generator", ("Hidden Markov Models", "Recurrent Neural Nets"))
 
 ########################################
 # Title
 st.title("Machine Learning Analysis")
 
+#######################################
+################ SETUP ################
 # Function to get csv file
 def GetFile():
     uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
@@ -101,6 +115,13 @@ def GetEncoder(dataframe, colunas):
     for col in colunas:
         dataframe[col] = le.fit_transform(dataframe[col])
     return dataframe
+
+# Function to normalize features
+def GetScaler(scalertype):
+    if scalertype == "StandardScaler":
+        return StandardScaler()
+    elif scalertype == "MinMaxScaler":
+        return MinMaxScaler(feature_range=(0,1))
 
 # Show CSV head
 try:
@@ -132,8 +153,9 @@ try:
     # Get features
     data_feature = GetFeatures(data_csv, X_features)
     # Features normalization
-    if st.checkbox("Normalize features"):
-        scaler = StandardScaler()
+    Scaler_Ttype = st.selectbox("Normalize features. Choose a normalizer: ", ["None", "StandardScaler", "MinMaxScaler"])
+    if Scaler_Ttype != "None":
+        scaler = GetScaler(Scaler_Ttype)
         scaler.fit(data_feature)
         df_scaled = scaler.transform(data_feature)
         data_feature = pd.DataFrame(df_scaled, columns=data_feature.columns)
@@ -143,17 +165,25 @@ try:
 except:
     st.write("Feature and Target cannot be loaded.")
 
-
-# Train Test Split
-lr_ts = st.number_input("Test size: ")
-lr_rs = st.number_input("Random state: ", min_value=1, step=1)
-try:
-    X_train, X_test, y_train, y_test = train_test_split(data_feature, data_target, test_size=lr_ts, random_state=int(lr_rs))
-except:
-    st.write("Data cannot be splitted.")
+if super_unsuper == "Supervised Learning":
+    # Train Test Split
+    lr_ts = st.number_input("Test size: ")
+    lr_rs = st.number_input("Random state: ", min_value=1, step=1)
+    try:
+        X_train, X_test, y_train, y_test = train_test_split(data_feature, data_target, test_size=lr_ts, random_state=int(lr_rs))
+    except:
+        st.write("Data cannot be splitted.")
 ########################################
 
 
+
+###########################################################################
+############################ SUPERVISED MODELS ############################
+###########################################################################
+
+########################################
+############## REGRESSION ##############
+########################################
 
 ########################################
 # LINEAR REGRESSION
@@ -419,18 +449,9 @@ if ML_option == "Pipeline Regression":
         pass
 
 
-
-
-
-
-
-
-
-
-
-##########################################################
-##########################################################
-# CLASSIFICATION
+########################################
+############ CLASSIFICATION ############
+########################################
 
 ########################################
 # LOGISTIC REGRESSION
@@ -467,6 +488,7 @@ if ML_option == "Logistic Regression":
     # plot_calibration_curve(y_test, [pred])
     # st.pyplot()
 
+
 ########################################
 # KNN CLASSIFIER
 ########################################        
@@ -499,6 +521,7 @@ if ML_option == "KNN Classifier":
     # plot_calibration_curve(y_test, [pred])
     # st.pyplot()        
 
+
 ########################################
 # DECISION TREE CLASSIFIER
 ########################################  
@@ -523,6 +546,7 @@ if ML_option == "Decision Tree Classifier":
         st.pyplot()
     except:
         st.write("Fill all parameters.")
+
 
 ########################################
 # RANDOM FOREST CLASSIFIER
@@ -554,6 +578,7 @@ if ML_option == "Random Forest Classifier":
     except:
         st.write("Fill all parameters.")
 
+
 ########################################
 # LINEAR DISCRIMINANT CLASSIFIER
 ######################################## 
@@ -580,6 +605,7 @@ if ML_option == "Linear Discriminant Analysis":
 
     except:
         st.write("Fill all parameters.")
+
 
 ########################################
 # NAIVE BAYES CLASSIFIER
@@ -608,6 +634,7 @@ if ML_option == "Naive Bayes":
     except:
         st.write("Fill all parameters.")
 
+
 ########################################
 # SUPPORT VECTOR CLASSIFIER
 ######################################## 
@@ -635,6 +662,10 @@ if ML_option == "Support Vector Classifier":
     except:
         st.write("Fill all parameters.")
 
+
+########################################
+# PIPELINE CLASSIFIER
+########################################
 if ML_option == "Pipeline":
     try:
         pipe_lr = Pipeline( [ ('scl', StandardScaler()), ('clf', MultiOutputClassifier(LogisticRegression()))])
@@ -673,20 +704,103 @@ if ML_option == "Pipeline":
 
 
 
+###########################################################################
+########################### UNSUPERVISED MODELS ###########################
+###########################################################################
+
+########################################
+############# CLUSTERING ###############
+######################################## 
+
+########################################
+# k-medians
+######################################## 
+if ML_option == "k-medians":
+    st.title("Under construction. Coming soon.")
+    image = Image.open("soon.png")
+    st.image(image, width=70)
+
+
+########################################
+# k-medoids
+######################################## 
+if ML_option == "k-medoids":
+    st.title("Under construction. Coming soon.")
+    image = Image.open("soon.png")
+    st.image(image, width=70)
+
+
+########################################
+# k-means
+######################################## 
+if ML_option == "k-means":
+    try:
+        # K-means parameters
+        Nk = st.number_input("Number of clusters: ", min_value=1, step=1)
+        KmeansClus = KMeans(n_clusters=Nk)
+        KmeansClus.fit(data_feature)
+        pred = KmeansClus.predict(data_feature)
+
+        st.subheader("Classification Report")
+        st.text(classification_report(data_target,pred))
+        
+        #Confusion matrix
+        plot_confusion_matrix(data_target,pred, figsize=(7,5), cmap="PuBuGn")
+        bottom,top = plt.ylim()
+        plt.ylim(bottom+0.5,top-0.5)
+        st.pyplot()
+    except Exception as e:
+        st.write(e)
 
 
 
+########################################
+# Fuzzy C-Means
+######################################## 
+if ML_option == "Fuzzy C-Means":
+    st.title("Under construction. Coming soon.")
+    image = Image.open("soon.png")
+    st.image(image, width=70)
 
 
+########################################
+# k-medoids
+######################################## 
+if ML_option == "Hierarchical Clustering":
+    st.title("Under construction. Coming soon.")
+    image = Image.open("soon.png")
+    st.image(image, width=70)
 
 
+########################################
+# k-medoids
+######################################## 
+if ML_option == "Decision Tree":
+    st.title("Under construction. Coming soon.")
+    image = Image.open("soon.png")
+    st.image(image, width=70)
 
 
+########################################
+############# Generation ###############
+######################################## 
+
+########################################
+# Hidden Markov Models
+######################################## 
+if ML_option == "Hidden Markov Models":
+    st.title("Under construction. Coming soon.")
+    image = Image.open("soon.png")
+    st.image(image, width=70)
 
 
-
-
-
+########################################
+# Recurrent Neural Nets
+######################################## 
+if ML_option == "Recurrent Neural Nets":
+    st.title("Under construction. Coming soon.")
+    image = Image.open("soon.png")
+    st.image(image, width=70)
 
 ###############################################
 
