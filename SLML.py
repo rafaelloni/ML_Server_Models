@@ -36,6 +36,9 @@ from sklearn.cluster import MiniBatchKMeans
 from sklearn.cluster import SpectralClustering
 from sklearn.cluster import DBSCAN
 
+# Unsuper Decomposition
+from sklearn.decomposition import PCA
+
 # Pipeline
 from sklearn.pipeline import Pipeline
 
@@ -54,6 +57,8 @@ from scikitplot.metrics import plot_confusion_matrix
 from scikitplot.metrics import plot_roc
 from scikitplot.metrics import plot_precision_recall
 from scikitplot.metrics import plot_calibration_curve
+from yellowbrick.cluster import KElbowVisualizer
+from yellowbrick.cluster import InterclusterDistance
 
 
 
@@ -79,11 +84,11 @@ if super_unsuper == "Supervised Learning":
     else:
         ML_option = st.sidebar.radio("Choose a classifier", ("Logistic Regression", "KNN Classifier", "Decision Tree Classifier", "Random Forest Classifier", "Linear Discriminant Analysis", "Naive Bayes","Support Vector Classifier","Pipeline"))
 else:
-    unsuper_cluster_gener = st.sidebar.radio("Choose a type", ("Clustering", "Generation"))
+    unsuper_cluster_gener = st.sidebar.radio("Choose a type", ("Clustering", "Decomposition"))
     if unsuper_cluster_gener == "Clustering":
         ML_option = st.sidebar.radio("Choose a cluster", ("k-means","Mini-Batch k-means", "Spectral Clustering", "DBSCAN"))
     else:
-        ML_option = st.sidebar.radio("Choose a generator", ("Hidden Markov Models", "Recurrent Neural Nets"))
+        ML_option = st.sidebar.radio("Choose a decomposor", ("PCA",))
 
 ########################################
 # Title
@@ -205,7 +210,7 @@ if ML_option == "Linear Regression":
         # Show features coefficient
         coeff_df = pd.DataFrame(linReg.coef_,index=["Coefficient"] ,columns=[data_feature.columns])
         st.write(coeff_df)
-
+        
         # Learning curve
         skplt.plot_learning_curve(linReg, X_train, y_train)
         st.pyplot()
@@ -223,6 +228,7 @@ if ML_option == "Linear Regression":
         plt.title("Distribution Plot")
         plt.xlabel("Target")
         st.pyplot()
+
     except:
         st.write("Fill all parameters.")
 
@@ -734,6 +740,18 @@ if ML_option == "k-means":
         bottom,top = plt.ylim()
         plt.ylim(bottom+0.5,top-0.5)
         st.pyplot()
+
+        # Elbow Method
+        visualizer = KElbowVisualizer(KmeansClus, k=(1,10))
+        visualizer.fit(data_feature)
+        visualizer.show()
+        st.pyplot()
+
+        # Inter Cluster Distances
+        visualizer_inter = InterclusterDistance(KmeansClus)
+        visualizer_inter.fit(data_feature)
+        visualizer_inter.show()
+        st.pyplot()
     except:
         st.write("Fill all parameters.")
 
@@ -757,6 +775,18 @@ if ML_option == "Mini-Batch k-means":
         bottom,top = plt.ylim()
         plt.ylim(bottom+0.5,top-0.5)
         st.pyplot()
+
+        # Elbow Method
+        visualizer = KElbowVisualizer(MBatchClus, k=(1,10))
+        visualizer.fit(data_feature)
+        visualizer.show()
+        st.pyplot()
+
+        # Inter Cluster Distances
+        visualizer_inter = InterclusterDistance(MBatchClus)
+        visualizer_inter.fit(data_feature)
+        visualizer_inter.show()
+        st.pyplot()
     except:
         st.write("Fill all parameters.")
 
@@ -778,6 +808,12 @@ if ML_option == "Spectral Clustering":
         plot_confusion_matrix(data_target,pred, figsize=(7,5), cmap="PuBuGn")
         bottom,top = plt.ylim()
         plt.ylim(bottom+0.5,top-0.5)
+        st.pyplot()
+
+        # Elbow Method
+        visualizer = KElbowVisualizer(SpecClus, k=(1,10))
+        visualizer.fit(data_feature)
+        visualizer.show()
         st.pyplot()
     except:
         st.write("Fill all parameters.")
@@ -807,27 +843,37 @@ if ML_option == "DBSCAN":
 
 
 ########################################
-############# Generation ###############
+########### Decomposition ##############
 ######################################## 
 
 ########################################
 # Hidden Markov Models
 ######################################## 
-if ML_option == "Hidden Markov Models":
-    st.title("Under construction. Coming soon.")
-    image = Image.open("soon.png")
-    st.image(image, width=70)
+if ML_option == "PCA":
+    try:
+        # PCA parameters
+        Ncomp = st.number_input("Number of components: ", min_value=1, step=1)
+        PCADec = PCA(n_components=Ncomp)
+        PCADec.fit(data_feature)
+        DataPCA = PCADec.transform(data_feature)
+        
+        # Plot PCA
+        plt.figure(figsize=(8,6))
+        plt.scatter(DataPCA[:,0],DataPCA[:,1],c=data_target[data_target.columns[0]],cmap='plasma')
+        plt.xlabel('First principal component')
+        plt.ylabel('Second Principal Component')
+        st.pyplot()
+
+        DataPCA2 = pd.DataFrame(PCADec.components_,columns=data_feature.columns)
+        plt.figure(figsize=(12,5))
+        sns.heatmap(DataPCA2,cmap='plasma',)
+        st.pyplot()
+    except:
+        #st.write(e)
+        st.write("Fill all parameters.")
 
 
-########################################
-# Recurrent Neural Nets
-######################################## 
-if ML_option == "Recurrent Neural Nets":
-    st.title("Under construction. Coming soon.")
-    image = Image.open("soon.png")
-    st.image(image, width=70)
 
-###############################################
 
 # st.sidebar.markdown("**Help us to improve this application. See the source code below. Follow us!**")
 # st.sidebar.markdown("[Source code](https://github.com/rafaelloni/ML_Server_Models)")
