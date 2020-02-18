@@ -910,4 +910,4 @@ if ML_option == "PCA":
 st.sidebar.markdown("**Contributors:**")
 st.sidebar.markdown("[Rafael Loni](https://github.com/rafaelloni)")
 st.sidebar.markdown("[Gabriel Filetti](https://github.com/GabrielFiletti)")
-st.sidebar.markdown(" ` Version 0.2 ` ")
+st.sidebar.markdown(" ` Version 0.2.1 ` ")
