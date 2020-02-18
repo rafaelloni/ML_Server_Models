@@ -11,6 +11,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import KFold
 
 # Super Regression
 from sklearn.linear_model import LinearRegression 
@@ -266,6 +268,16 @@ if ML_option == "KNN Regression":
         plt.title("Distribution Plot")
         plt.xlabel("Target")
         st.pyplot()
+
+        # Grid Search
+        if st.button("Grid Search"):
+            param_grid = {"n_neighbors":[1,2,3,4,5,6,7,8,9,10], "weights":["uniform", "distance"], 
+                                "algorithm":["auto", "ball_tree", "kd_tree", "brute"]}
+            grid = GridSearchCV(KNeighborsRegressor(),param_grid,verbose=3)
+            grid.fit(X_train, y_train)
+            st.write("Best parameters:", grid.best_params_)
+            grid_pred = grid.predict(X_test)
+            st.write("R2 Score: ", round(r2_score(y_test, grid_pred),4))
     except:
         st.write("Fill all parameters.")
 
@@ -301,6 +313,15 @@ if ML_option == "Decision Tree Regressor":
         plt.title("Distribution Plot")
         plt.xlabel("Target")
         st.pyplot()
+
+        # Grid Search
+        if st.button("Grid Search"):
+            param_grid = {"criterion":["mse", "friedman_mse", "mae"], "min_samples_split":[2,3,4,5,0.1,0.2,0.3,0.4,0.5]}
+            grid = GridSearchCV(DecisionTreeRegressor(),param_grid,verbose=3)
+            grid.fit(X_train, y_train)
+            st.write("Best parameters:", grid.best_params_)
+            grid_pred = grid.predict(X_test)
+            st.write("R2 Score: ", round(r2_score(y_test, grid_pred),4))
     except:
         st.write("Fill all parameters.")
 
@@ -372,7 +393,7 @@ if ML_option == "Bayesian Ridge Regression":
 
         # Distribuition Plot
         ibins = st.number_input("bins: ",min_value=1,step=1)
-        sns.distplot((y_test-[pred]),bins=int(ibins))
+        sns.distplot((y_test-pred),bins=int(ibins))
         plt.title("Distribution Plot")
         plt.xlabel("Target")
         st.pyplot()
@@ -411,10 +432,19 @@ if ML_option == "Support Vector Regression":
 
         # Distribuition Plot
         ibins = st.number_input("bins: ",min_value=1,step=1)
-        sns.distplot((y_test-[pred]),bins=int(ibins))
+        sns.distplot((y_test-pred),bins=int(ibins))
         plt.title("Distribution Plot")
         plt.xlabel("Target")
         st.pyplot()
+
+        # Grid Search
+        if st.button("Grid Search"):
+            param_grid = {"C":[0.1,1,10,100,1000], "gamma":[1,0.1,0.01,0.001,0.0001], "epsilon":[0.1,0.2,0.3,0.4,0.5]}
+            grid = GridSearchCV(SVR(),param_grid,verbose=3)
+            grid.fit(X_train, y_train)
+            st.write("Best parameters:", grid.best_params_)
+            grid_pred = grid.predict(X_test)
+            st.write("R2 Score: ", round(r2_score(y_test, grid_pred),4))
     except:
         st.write("Fill all parameters.")
     
