@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from PIL import Image
+import datetime
 
 # Preprocessing
 from sklearn.preprocessing import StandardScaler
@@ -138,7 +139,8 @@ try:
     data_csv = GetFile()
     st.write(data_csv.head())
 except:
-    st.write("You must upload a dataset.")
+    st.markdown("You must upload a dataset.")
+    st.markdown("**This is a trial to show how this application works. To upload a dataset bigger than 1 MB, [contact us](https://www.linkedin.com/in/rafael-loni/)**.")
 
 
 # Label encoder
@@ -330,6 +332,8 @@ if ML_option == "Decision Tree Regressor":
 # RANDOM FOREST REGRESSION
 ########################################
 if ML_option == "Random Forest Regressor":
+    initial_time = datetime.datetime.now()
+
     # Fit the model and predict X_test. Show some analysis.
     try:
         st.subheader("Random Forest Parameters")
@@ -360,6 +364,24 @@ if ML_option == "Random Forest Regressor":
         plt.title("Distribution Plot")
         plt.xlabel("Target")
         st.pyplot()
+
+        final_time = datetime.datetime.now()
+        delta_time = final_time - initial_time
+        st.write("Execution time:", delta_time)
+
+        # Grid Search
+        if st.button("Grid Search"):
+            grid_initial_time = datetime.datetime.now()
+            param_grid = {"n_estimators":[10, 100, 500, 1000], "criterion":["mse", "mae"], "min_samples_split":[2,3,4,5,0.1,0.2,0.3,0.4,0.5]}
+            grid = GridSearchCV(RandomForestRegressor(random_state=RanStaFor),param_grid,verbose=3)
+            grid.fit(X_train, y_train)
+            grid.best_params_["random_state"] = RanStaFor
+            st.write("Best parameters:", grid.best_params_)
+            grid_pred = grid.predict(X_test)
+            st.write("R2 Score: ", round(r2_score(y_test, grid_pred),4))
+            grid_final_time = datetime.datetime.now()
+            grid_delta_time = grid_final_time - grid_initial_time
+            st.write("Grid execution time:", grid_delta_time)
     except:
         st.write("Fill all parameters.")
 
