@@ -140,7 +140,7 @@ try:
     st.write(data_csv.head())
 except:
     st.markdown("You must upload a dataset.")
-    st.markdown("**This is a trial to show how this application works. To upload a dataset bigger than 1 MB, [contact us](https://www.linkedin.com/in/rafael-loni/)**.")
+    st.markdown("**This is a trial to show how this application works. To upload a dataset bigger than 10 MB, [contact us](https://www.linkedin.com/in/rafael-loni/)**.")
 
 
 # Label encoder
